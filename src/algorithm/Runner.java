@@ -1,73 +1,117 @@
 package algorithm;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Runner {
 	
-	private static final int start = 0, end = 2;
+	public static final int startX = 1, startY = 1, 
+							endX = 17, endY = 9;
+	
 	private List<Node> nodes;
 	private List<Edge> edges;
+	
+	private List<String> streetNames;
 	
 	public void testExecute() {
 		nodes = new ArrayList<Node>();
 		edges = new ArrayList<Edge>();
+		streetNames = new ArrayList<String>();
 		
-		/*Dijkstra's Stuff
-		for(int i = 0; i < 12; i++) {
-			//Node location = new Node("Node_" + i, (int)(Math.random()*200), (int)(Math.random()*200));
-			Node location = new Node("Node_" + i, 1, i);
-			nodes.add(location);
-		}
-		addEdge("Edge_0", 0, 1);
-		addEdge("Edge_1", 0, 2);
-		addEdge("Edge_2", 0, 4);
-		addEdge("Edge_3", 2, 6);
-		addEdge("Edge_4", 2, 7);
-		addEdge("Edge_5", 3, 7);
-		addEdge("Edge_6", 5, 8);
-		addEdge("Edge_7", 8, 9);
-		addEdge("Edge_8", 7, 9);
-		addEdge("Edge_9", 4, 9);
-		addEdge("Edge_10", 9, 10);
-		addEdge("Edge_11", 1, 10);
-		addEdge("Edge_12", 5, 11);
-		addEdge("Edge_13", 2, 11);
-		addEdge("Edge_13", 4, 11);
-		addEdge("Edge_14", 1, 0);
-		addEdge("Edge_15", 9, 11);
-		*/
-		nodes.add(new Node("Node_A", 1, 5));
-		nodes.add(new Node("Node_B", 3, 5));
-		nodes.add(new Node("Node_C", 5, 1));
-		addEdge("Edge_AB", 0, 1);
-		addEdge("Edge_BC", 1, 2);
-		addEdge("Edge_AC", 0, 2, 100.0);
+		getStreetNames("src/res/Street_Names.txt");
+		getEdges("src/res/edges.txt");
 		
-        Graph graph = new Graph(nodes, edges);
-        //Dijkstra dijkstra = new Dijkstra(graph);
-        Astar a = new Astar(graph);
+        Astar a = new Astar(new Graph(nodes, edges));
+        Node start = getNode(startX, startY);
+        Node end = getNode(endX, endY);
+        
         //Calculate shortest path to given node for all nodes.
-        //dijkstra.run(nodes.get(start), nodes.get(end));
-        a.run(nodes.get(start),  nodes.get(end));
+        a.run(start, end);
+        //d.run(start, end);
 	}
 
 	/*
 	 * @param name the name of the edge
 	 * @param start the index of the edge's first node
 	 * @param end the index of the edge's connecting node
-	 * @param length the weight of the edge
 	 */
-	private Edge addEdge(String name, int start, int end) {
-		Edge edge = new Edge(name, nodes.get(start), nodes.get(end), Node.distanceFrom(nodes.get(start), nodes.get(end)));
+	private Edge addEdge(String name, Node start, Node end) {
+		Edge edge = new Edge(name, start, end, Node.distanceFrom(start, end));
 		edges.add(edge);
 		return edge;
 	}
 	
-	private Edge addEdge(String name, int start, int end, Double length) {
-		Edge edge = new Edge(name, nodes.get(start), nodes.get(end), length);
-		edges.add(edge);
-		return edge;
+	private void getEdges(String path) {
+		FileReader file;
+		try {
+			file = new FileReader(path);
+			BufferedReader reader = new BufferedReader(file);
+			String line = null;
+			//Parse text file to create Edges
+			Random r = new Random();
+			while((line = reader.readLine()) != null) {
+				String[] arr = line.split(";");
+				String name = streetNames.get(r.nextInt(streetNames.size()));
+				//This is an Edge
+				if(arr.length > 2) {
+					Node start = new Node("" + Integer.parseInt(arr[0]) + ", " + Integer.parseInt(arr[1]), Integer.parseInt(arr[0]), Integer.parseInt(arr[1]));
+					Node end = new Node("" + Integer.parseInt(arr[2]) + ", " + Integer.parseInt(arr[3]), Integer.parseInt(arr[2]), Integer.parseInt(arr[3]));
+					//Check if nodes already contains the start or end node. If so, set start and end equal to the found node.
+					boolean startAdded = false;
+					boolean endAdded = false;
+					for(Node n : nodes) {
+						if(start.equals(n)) {
+							start = n;
+							startAdded = true;
+						}
+						if(end.equals(n)) {
+							end = n;
+							endAdded = true;
+						}
+					}
+					if(!startAdded) nodes.add(start);
+					if(!endAdded) nodes.add(end);
+					addEdge(name, start, end);
+				}
+				//This is a Node with no outgoing edges
+				else {
+					Node node = new Node("" + Integer.parseInt(arr[0]) + ", " + Integer.parseInt(arr[1]), Integer.parseInt(arr[0]), Integer.parseInt(arr[1]));
+					nodes.add(node);
+				}
+			}
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private Node getNode(int x, int y) {
+		Node node = new Node("", x, y);
+		for(Node n : nodes) {
+			if(node.equals(n)) {
+				return n;
+			}
+		}
+		return null;
+	}
+	
+	private void getStreetNames(String path) {
+		try {
+			FileReader file = new FileReader(path);
+			BufferedReader reader = new BufferedReader(file);
+			String line = null;
+			while((line = reader.readLine()) != null) {
+				streetNames.add(line.split(",")[0]);
+			}
+			file.close();
+			reader.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public static void main(String[] args) {

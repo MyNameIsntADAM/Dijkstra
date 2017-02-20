@@ -44,6 +44,7 @@ public class Astar {
 		while(!unsearched.isEmpty()) {
 			//If the current node is our target, print the path and end
 			current = unsearched.poll();
+			System.out.println(current);
 			if(current.equals(end)) {
 				Node.printPath(end);
 				return;

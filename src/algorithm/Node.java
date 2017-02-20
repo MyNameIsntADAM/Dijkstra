@@ -40,8 +40,15 @@ public class Node implements Comparable<Node> {
 		distance = d;
 	}
 	
-	public boolean equals(Node n) {
-		return n.toString().equals(name);
+	public boolean equals(Object o) {
+		return coord.equals(((Node)o).coord);
+	}
+	
+	public int hashCode() {
+		int hash = 1;
+		hash += coord.x*7;
+		hash += coord.y*13;
+		return hash;
 	}
 	
 	public void setHeuristic(Node destination) {
