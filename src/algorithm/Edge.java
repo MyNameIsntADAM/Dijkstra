@@ -28,10 +28,6 @@ public class Edge {
 		return end;
 	}
 	
-	public String toString() {
-		return "Start: " + start + ", " + end;
-	}
-	
 	public boolean equals(Edge e) {
 		return e.getName().equals(name);
 	}

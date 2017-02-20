@@ -1,12 +1,23 @@
 package algorithm;
 
-public class Node {
+import java.awt.Point;
+import java.util.Stack;
+
+public class Node implements Comparable<Node> {
 	private String name;
 	private Double distance = Double.MAX_VALUE;
+	//We need Euclidian points if we are going to use A* search (Euclidian distance will serve as our heuristic)
+	private Point coord;
+	private Double heuristic;
 	private Node previous = null;
 	
 	public Node(String name) {
 		this.name = name;
+	}
+	
+	public Node(String name, int x, int y) {
+		this(name);
+		coord = new Point(x ,y);
 	}
 	
 	public String toString() {
@@ -32,4 +43,40 @@ public class Node {
 	public boolean equals(Node n) {
 		return n.toString().equals(name);
 	}
+	
+	public void setHeuristic(Node destination) {
+		this.heuristic = Node.distanceFrom(this, destination);
+	}
+	
+	/*
+	 * Static helper function used to print the path of a given destination node.
+	 */
+	public static Double distanceFrom(Node n1, Node n2) {
+		return Math.sqrt((n1.coord.x-n2.coord.x)*(n1.coord.x-n2.coord.x) + (n1.coord.y-n2.coord.y)*(n1.coord.y-n2.coord.y));
+	}
+	
+	public static void printPath(Node destination) {
+		System.out.println("Total distance traveled: " + destination.getDistance());
+		Node current = destination;
+		Stack<Node> path = new Stack<Node>();
+		path.push(destination);
+		
+		//Enqueue all path nodes to a stack (so we can easily print in reverse order)
+		while(current.getPrevious() != null) {
+			current = current.getPrevious();
+			path.push(current);
+		}
+		
+		//Print out the path in the correct order
+		do {
+			System.out.println(path.pop());
+		}
+		while(!path.isEmpty());
+	}
+
+	@Override
+	public int compareTo(Node n) {
+		return Double.compare(heuristic + distance, n.heuristic + n.distance);
+	}
+	
 }

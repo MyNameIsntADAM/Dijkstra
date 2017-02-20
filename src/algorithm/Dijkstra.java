@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
 
 public class Dijkstra {
 	
@@ -42,11 +41,13 @@ public class Dijkstra {
 		unsearched.add(start);
 		
 		while(!unsearched.isEmpty()) {
-			//Set current to the node with the least distance to start
+			//Check if current is our target destination. If so, print out the path and end the function.
 			if(current.equals(end)) {
-				printPath(end);
+				Node.printPath(end);
 				return;
 			}
+
+			//Set current to the node with the least distance to start
 			current = getClosest();
 			searched.add(current);
 			unsearched.remove(current);
@@ -76,37 +77,16 @@ public class Dijkstra {
 			updateNeighborDistances(current);
 		}
 	}
-	/*
-	 * @param destination the node whose shortest path to the start node we want to print
-	 */
-	public void printPath(Node destination) {
-		System.out.println("Total distance traveled: " + destination.getDistance());
-		Node current = destination;
-		Stack<Node> path = new Stack<Node>();
-		path.push(destination);
-		
-		//Enqueue all path nodes to a stack (so we can easily print in reverse order)
-		while(current.getPrevious() != null) {
-			current = current.getPrevious();
-			path.push(current);
-		}
-		
-		//Print out the path in the correct order
-		do {
-			System.out.println(path.pop());
-		}
-		while(!path.isEmpty());
-	}
 	
 	/*
 	 * @param curr the node whose neighbors we will update
 	 */
 	private void updateNeighborDistances(Node curr) {
-		List<Node> neighbors = getNeighbors(curr);
+		List<Node> neighbors = Graph.getNeighbors(edges, curr);
 		Double distance = curr.getDistance();
 		for(Node neighbor : neighbors) {
 			//Updates distances for nodes that neighbor @param curr
-				Double temp = getDistanceFrom(curr, neighbor);
+				Double temp = Graph.getDistanceFrom(edges, curr, neighbor);
 				if(distance + temp < neighbor.getDistance()) {
 					neighbor.setPrevious(curr);
 					neighbor.setDistance(distance + temp);
@@ -133,23 +113,5 @@ public class Dijkstra {
 		return closest;
 	}
 	
-	private Double getDistanceFrom(Node start, Node end) {
-		for(Edge e : edges) {
-			if(e.getStart().equals(start) && e.getEnd().equals(end)) {
-				return e.getLength();
-			}
-		}
-		return null;
-	}
-	
-	private ArrayList<Node> getNeighbors(Node n) {
-		ArrayList<Node> neighbors = new ArrayList<Node>();
-		for(Edge edge : edges) {
-			if(edge.getStart().equals(n)) {
-				neighbors.add(edge.getEnd());
-			}
-		}
-		return neighbors;
-	}
 	
 }
