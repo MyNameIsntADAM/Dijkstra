@@ -44,15 +44,13 @@ public class Node implements Comparable<Node> {
 		return coord.equals(((Node)o).coord);
 	}
 	
-	public int hashCode() {
-		int hash = 1;
-		hash += coord.x*7;
-		hash += coord.y*13;
-		return hash;
-	}
-	
 	public void setHeuristic(Node destination) {
 		this.heuristic = Node.distanceFrom(this, destination);
+	}
+	
+	@Override
+	public int compareTo(Node n) {
+		return Double.compare(heuristic + distance, n.heuristic + n.distance);
 	}
 	
 	/*
@@ -75,15 +73,11 @@ public class Node implements Comparable<Node> {
 		}
 		
 		//Print out the path in the correct order
+		int i = 0;
 		do {
-			System.out.println(path.pop());
+			System.out.println(++i + ": " + path.pop());
 		}
 		while(!path.isEmpty());
-	}
-
-	@Override
-	public int compareTo(Node n) {
-		return Double.compare(heuristic + distance, n.heuristic + n.distance);
 	}
 	
 }

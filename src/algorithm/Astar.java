@@ -1,6 +1,5 @@
 package algorithm;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -15,14 +14,7 @@ public class Astar {
 	
 	public Astar(Graph graph) {
 		this.graph = graph;
-		resetGraph();
-	}
-	
-	/*
-	 * Clears all edges;
-	 */
-	private void resetGraph() {
-		this.edges = new ArrayList<Edge>(graph.getEdges());
+		edges = graph.getEdges();
 	}
 	
 	/*
@@ -42,8 +34,9 @@ public class Astar {
 		unsearched.add(start);
 		
 		while(!unsearched.isEmpty()) {
-			//If the current node is our target, print the path and end
+			//Pop the PriorityQueue and set current to the top element;
 			current = unsearched.poll();
+			//If the current node is our target, print the path and end
 			System.out.println(current);
 			if(current.equals(end)) {
 				Node.printPath(end);
@@ -51,7 +44,6 @@ public class Astar {
 			}
 			//Move current node to the searched list.
 			searched.add(current);
-			//Pop the PriorityQueue and set current to the top element;
 			updateNeighbor(current, end);
 		}
 		//We did not find the shortest path.

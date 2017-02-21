@@ -31,7 +31,6 @@ public class Runner {
         
         //Calculate shortest path to given node for all nodes.
         a.run(start, end);
-        //d.run(start, end);
 	}
 
 	/*
